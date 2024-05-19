@@ -1,0 +1,62 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2024-05-19T15:51:28+02:00",
+    "name": "Super Mario Odyssey Online",
+    "author": "ian.risch@gmail.com",
+    "description": "Super Mario Odyssey Online Server",
+    "features": null,
+    "docker_images": {
+        "quay.io\/thunfischeis\/pterodactyl-images:alpine_net6": "quay.io\/thunfischeis\/pterodactyl-images:alpine_net6"
+    },
+    "file_denylist": [],
+    "startup": ".\/Server",
+    "config": {
+        "files": "{\r\n    \"settings.json\": {\r\n        \"parser\": \"json\",\r\n        \"find\": {\r\n            \"Server.Port\": \"{{server.build.default.port}}\",\r\n            \"Server.MaxPlayers\": \"{{env.max_players}}\",\r\n            \"Scenario.MergeEnabled\": \"{{env.merge_enabled}}\",\r\n            \"PersistShines.Enabled\": true,\r\n            \"Shines.Enabled\": \"{{env.shines}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \"Listening on\"\r\n}",
+        "logs": "{}",
+        "stop": "exit"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\n# SMOO Installation Script\r\n#\r\n# Server Files: \/mnt\/server\r\napk update\r\napk add git dotnet6-sdk\r\n\r\nif [[ ! -d \/mnt\/server ]]; then\r\n  mkdir \/mnt\/server\r\nfi\r\n\r\ncd \/mnt\/server\r\n\r\n#Clone and Build\r\ngit clone https:\/\/github.com\/Sanae6\/SmoOnlineServer\r\ndotnet publish .\/SmoOnlineServer\/Server\/Server.csproj -c Release -r linux-musl-x64 --self-contained -p:publishSingleFile=true -o .\/build\r\n\r\n# CleanUp\r\nrm -r SmoOnlineServer\r\nmv build\/* .\/\r\nrm -r build",
+            "container": "alpine",
+            "entrypoint": "ash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Max Players",
+            "description": "Change the maximum of players",
+            "env_variable": "max_players",
+            "default_value": "8",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|integer|between:2,10",
+            "field_type": "text"
+        },
+        {
+            "name": "MergeEnabled",
+            "description": "When the players are in different stages of the story (scenarios), they are technically in different levels and don't see each other. This option tries to merge them virtually all together, so they can see each other without being in the same level. 0 = off, 1 = on",
+            "env_variable": "merge_enabled",
+            "default_value": "0",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        },
+        {
+            "name": "Shines",
+            "description": "Can be used to disable moon synchronization between players. 0 = off, 1 = on",
+            "env_variable": "shines",
+            "default_value": "1",
+            "user_viewable": true,
+            "user_editable": true,
+            "rules": "required|boolean",
+            "field_type": "text"
+        }
+    ]
+}
